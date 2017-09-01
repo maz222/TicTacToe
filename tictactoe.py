@@ -110,15 +110,16 @@ gameOver = False
 while gameOver == False:
 	if board.checkGrid(human, board.grid) or len(board.getSpots(board.grid)) == 0 or board.checkGrid(bot, board.grid):
 		gameOver = True
+		break
 	if currPlayer == human:
 		print(board)
-		moveRow = input("row: ")
-		moveCol = input("column: ")
+		moveRow = input("x: ")
+		moveCol = input("y: ")
 		board.grid[int(moveCol)][int(moveRow)] = currPlayer
 		currPlayer = bot
 	else:
 		move = board.getMove(currPlayer)
 		board.grid[move[0]][move[1]] = currPlayer
 		currPlayer = human
-print("Game Over!!!")
+print("\n\tGame Over!!!")
 print(board)
