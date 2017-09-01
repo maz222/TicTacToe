@@ -31,9 +31,9 @@ class Board:
 	def getMove(self,player):
 		spots = self.getSpots(self.grid)
 		if player == human: 
-			bestScore = [-10]
+			bestScore = [-10,100]
 		else:
-			bestScore = [10]
+			bestScore = [10,100]
 		bestMove = 0
 		for i in range(len(spots)):
 			self.grid[spots[i][0]][spots[i][1]] = player
@@ -120,11 +120,12 @@ while gameOver == False:
 		board.grid[int(moveCol)][int(moveRow)] = currPlayer
 		currPlayer = bot
 	else:
-		move = board.getMove(human)
+		move = board.getMove(bot)
 		board.grid[move[0]][move[1]] = currPlayer
 		currPlayer = human
-	#if board.checkGrid(bot, board.grid) or board.checkGrid(human, board.grid):
-		#gameOver = True
+	if board.checkGrid(bot, board.grid) or board.checkGrid(human, board.grid):
+		gameOver = True
+print(board)
 
 
 
