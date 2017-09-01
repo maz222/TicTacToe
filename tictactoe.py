@@ -1,11 +1,12 @@
-human = "X"
+human = " X "
 #human = MAX
-bot = "O"
+bot = " O "
 #bot = MIN
+empty = " . "
 
 class Board:
 	def __init__(self):
-		self.grid = [[0,0,0],[0,0,0],[0,0,0]]
+		self.grid = [[empty,empty,empty],[empty,empty,empty],[empty,empty,empty]]
 
 	def checkHorizontal(self, player, col, grid):
 		if grid[col][0] != player:
@@ -35,7 +36,7 @@ class Board:
 		moves = []
 		for col in range(3):
 			for row in range(3):
-				if grid[col][row] == 0:
+				if grid[col][row] == empty:
 					moves.append([col,row])
 		return moves
 
@@ -61,7 +62,7 @@ class Board:
 				result = self.minimax(bot,grid)["score"]
 				move["score"] = result
 			#reset
-			grid[move["index"][0]][move["index"][1]] = 0
+			grid[move["index"][0]][move["index"][1]] = empty
 			moves.append(move)
 
 		bestMove = None
@@ -82,8 +83,23 @@ class Board:
 
 
 	def __str__(self):
-		gridStr = "-----" + "\n" + str(self.grid[2]) + "\n" + str(self.grid[1]) + "\n" + str(self.grid[0]) + "\n" + "-----"
+		firstLine = self.formatLine(self.grid[2])
+		secondLine = self.formatLine(self.grid[1])
+		thirdLine = self.formatLine(self.grid[0])
+		hRule = self.getHorizRule(firstLine)
+
+		#ridStr = "-----" + "\n" + str(self.grid[2]) + "\n" + str(self.grid[1]) + "\n" + str(self.grid[0]) + "\n" + "-----"
+		gridStr = "\n" + firstLine + hRule + secondLine + hRule + thirdLine
 		return gridStr
+
+	def formatLine(self,line):
+		return "\t" + str(line[0]) + "|" + str(line[1]) + "|" + str(line[2]) + "\n"
+
+	def getHorizRule(self,line):
+		rule = ""
+		for i in range(len(line)-2):
+			rule += "-"
+		return "\t" + rule + "\n";
 
 
 board = Board()
@@ -96,8 +112,8 @@ while gameOver == False:
 		gameOver = True
 	if currPlayer == human:
 		print(board)
-		moveCol = input("column: ")
 		moveRow = input("row: ")
+		moveCol = input("column: ")
 		board.grid[int(moveCol)][int(moveRow)] = currPlayer
 		currPlayer = bot
 	else:
