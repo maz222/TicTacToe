@@ -29,32 +29,7 @@ class Board:
 						self.checkDiagonal(player,grid))
 
 	def getMove(self,player):
-		spots = self.getSpots(self.grid)
-		if player == human: 
-			bestScore = [-10,100]
-		else:
-			bestScore = [10,100]
-		bestMove = 0
-		for i in range(len(spots)):
-			self.grid[spots[i][0]][spots[i][1]] = player
-			if player == human:
-				score = self.minimax(bot,self.grid,1)
-				if score[0] > bestScore[0]:
-					bestScore = score
-					bestMove = i
-				elif score[0] == bestScore[0] and score[1] < bestScore[1]:
-					bestScore = score
-					bestMove = i
-			else:
-				score = self.minimax(human,self.grid,1)
-				if score < bestScore:
-					bestScore = score
-					bestMove = i
-				elif score[0] == bestScore[0] and score[1] < bestScore[1]:
-					bestScore = score
-					bestMove = i
-			self.grid[spots[i][0]][spots[i][1]] = 0
-		return spots[bestMove]
+		return self.minimax(player, self.grid)["index"]
 
 	def getSpots(self,grid):
 		moves = []
@@ -64,43 +39,47 @@ class Board:
 					moves.append([col,row])
 		return moves
 
-	def minimax(self,player,grid,depth):
-		if self.checkGrid(player,grid):
-			if player == human:
-				return [10, depth]
-			else: 
-				return [-10, depth]
-		else:			
-			avilableSpots = self.getSpots(grid)
-			scores = []
-			for spot in avilableSpots:
-				#do move
-				grid[spot[0]][spot[1]] = player
-				if player == human:
-					score = self.minimax(bot,grid,depth+1)
-					scores.append(score)
-				else:
-					score = self.minimax(human,grid,depth+1)
-					scores.append(score)
-				#reset grid
-				grid[spot[0]][spot[1]] = 0
-			if player == human:
-				bestScore = [-10, depth]
-				for i in range(len(scores)):
-					if scores[i][0] > bestScore[0]:
-						bestScore = scores[i]
-					elif scores[i][0] == bestScore[0] and scores[i][1] < bestScore[1]:
-						bestScore = scores[i]
-				return bestScore
+	def minimax(self,player,grid):
+		spots = self.getSpots(grid)
+		if self.checkGrid(human,grid):
+			return {"score":-10}
+		elif self.checkGrid(bot,grid):
+			return {"score":10}
+		if len(spots) == 0:
+			return {"score":0}
+
+		moves = []
+		for i in range(len(spots)):
+			#log spot
+			move = {"index":spots[i]}
+			#do move
+			grid[move["index"][0]][move["index"][1]] = player
+			if player == bot:
+				result = self.minimax(human,grid)["score"]
+				move["score"] = result
 			else:
-				bestScore = [10, depth]
-				for i in range(len(scores)):
-					if scores[i][0] < bestScore[0]:
-						bestScore = scores[i]
-					elif scores[i][0] == bestScore[0] and scores[i][1] < bestScore[1]:
-						bestScore = scores[i]
-				return bestScore
-		return [0, depth]
+				result = self.minimax(bot,grid)["score"]
+				move["score"] = result
+			#reset
+			grid[move["index"][0]][move["index"][1]] = 0
+			moves.append(move)
+
+		bestMove = None
+		if player == bot:
+			bestScore = -1000
+			for i in range(len(moves)):
+				if moves[i]["score"] > bestScore:
+					bestScore = moves[i]["score"]
+					bestMove = i
+		else:
+			bestScore = 1000
+			for i in range(len(moves)):
+				if moves[i]["score"] < bestScore:
+					bestScore = moves[i]["score"]
+					bestMove = i
+
+		return moves[bestMove]
+
 
 	def __str__(self):
 		gridStr = "-----" + "\n" + str(self.grid[2]) + "\n" + str(self.grid[1]) + "\n" + str(self.grid[0]) + "\n" + "-----"
@@ -120,13 +99,8 @@ while gameOver == False:
 		board.grid[int(moveCol)][int(moveRow)] = currPlayer
 		currPlayer = bot
 	else:
-		move = board.getMove(bot)
+		move = board.getMove(currPlayer)
 		board.grid[move[0]][move[1]] = currPlayer
 		currPlayer = human
 	if board.checkGrid(bot, board.grid) or board.checkGrid(human, board.grid):
 		gameOver = True
-print(board)
-
-
-
-
